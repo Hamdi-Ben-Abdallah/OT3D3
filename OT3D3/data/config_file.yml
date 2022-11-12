@@ -1,0 +1,13 @@
+%YAML:1.0
+
+projDir: "C:/Users/hba/source/repos/PersonalProject/3rdParty/DT3D_data/V8"
+
+# Near and far plane of the OpenGL view frustum
+zn: 10
+zf: 10000
+
+scale: 1.0
+qualityThreshold: 0.55
+
+color: "#9429c2"
+
