@@ -1,10 +1,13 @@
 #include <iomanip>
+
 #include <glog/logging.h>
+
 #include <opencv2/highgui.hpp>
+
 #include "view.h"
-#include "histogram.h"
 #include "tracker.h"
 #include "object3d.h"
+#include "histogram.h"
 #include "search_line.h"
 #include "tracker_slc.h"
 
@@ -147,14 +150,12 @@ void Tracker::EstimatePoses(cv::Mat frame, bool check_lost)
 	cv::Mat frameCpy = frame.clone();
 	imagePyramid.push_back(frameCpy);
 
-	for (int l = 1; l < 4; l++) 
-	{
+	for (int l = 1; l < 4; l++) {
 		cv::resize(frame, frameCpy, cv::Size(frame.cols / pow(2, l), frame.rows / pow(2, l)));
 		imagePyramid.push_back(frameCpy);
 	}
 
-	if (initialized) 
-	{
+	if (initialized) {
 		Track(imagePyramid, objects);
 		//CheckPose(objects);
 	}
@@ -313,7 +314,6 @@ void TrackerBase::PostProcess(cv::Mat frame) {
 }
 
 void TrackerBase::UpdateHist(cv::Mat frame) {
-
 	float afg = 0.1f, abg = 0.2f;
 	if (initialized) {
 		view->setLevel(0);

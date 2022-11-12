@@ -118,7 +118,7 @@ int main(int argc, char* argv[])
 	QApplication a(argc, argv);
 
 	spdlog::set_level(spdlog::level::debug); // Set global log level to debug
-	spdlog::info("OT3D-1.0.0");
+	spdlog::info("OT3D-3.0.0");
 
 	OT3D::GlobalParam* gp = OT3D::GlobalParam::Instance();
 	gp->ParseConfig("data/config_file.yml");

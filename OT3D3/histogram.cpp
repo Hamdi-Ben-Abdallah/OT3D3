@@ -1,8 +1,8 @@
 #include <opencv2/highgui.hpp>
 
 #include "view.h"
-#include "search_line.h"
 #include "histogram.h"
+#include "search_line.h"
 
 Histogram::Histogram() {
 	view = View::Instance();

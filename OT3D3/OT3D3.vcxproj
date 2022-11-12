@@ -146,7 +146,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="camcorder.h" />
     <ClInclude Include="dirent_win.h" />
     <ClInclude Include="global_params.h" />
     <ClInclude Include="histogram.h" />

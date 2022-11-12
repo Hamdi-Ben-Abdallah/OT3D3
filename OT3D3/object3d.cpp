@@ -1,6 +1,6 @@
 #include "object3d.h"
-#include "tclc_histograms.h"
 #include "template_view.h"
+#include "tclc_histograms.h"
 
 using namespace std;
 using namespace cv;

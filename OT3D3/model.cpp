@@ -1,13 +1,13 @@
-#include "model.h"
-#include "tclc_histograms.h"
-
 #include <limits>
 
-#include <assimp/mesh.h>
 #include <assimp/scene.h>
+#include <assimp/mesh.h>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
+
 #include "utils.h"
+#include "model.h"
+#include "tclc_histograms.h"
 
 using namespace std;
 using namespace cv;
@@ -326,7 +326,7 @@ void Model::loadModel(const string modelFilename)
     offsets.push_back(mesh->mNumFaces*3);
     
     // the center of the 3d bounding box
-    //bbCenter = (rtf + lbn) / 2;
+    //Vec3f bbCenter = (rtf + lbn) / 2;
     // compute a normalization transform that moves the object to the center of its bounding box and scales it according to the prescribed factor
     //T_n = Transformations::scaleMatrix(scaling) * Transformations::translationMatrix(-bbCenter[0], -bbCenter[1], -bbCenter[2]);
 

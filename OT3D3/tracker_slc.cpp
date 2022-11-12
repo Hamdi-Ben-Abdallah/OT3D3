@@ -35,8 +35,7 @@ SLCTracker::SLCTracker(const cv::Matx33f& K, std::vector<Object3D*>& objects)
 
 }
 
-void SLCTracker::PreProcess(cv::Mat frame) 
-{
+void SLCTracker::PreProcess(cv::Mat frame) {
 	UpdateHist(frame);
 }
 

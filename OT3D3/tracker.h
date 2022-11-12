@@ -3,8 +3,8 @@
 #include <opencv2/core.hpp>
 
 #include "object3d.h"
-#include "template_view.h"
 #include "signed_distance_transform2d.h"
+#include "template_view.h"
 
 class Viewer;
 
@@ -62,8 +62,8 @@ class TrackerBase : public Tracker {
 public:
 	TrackerBase(const cv::Matx33f& K, std::vector<Object3D*>& objects);
 
-	virtual void PreProcess(cv::Mat frame);
-	virtual void PostProcess(cv::Mat frame);
+	virtual void PreProcess(cv::Mat frame) override;
+	virtual void PostProcess(cv::Mat frame) override;
 	virtual void UpdateHist(cv::Mat frame);
 
 protected:
