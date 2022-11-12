@@ -121,7 +121,7 @@ int main(int argc, char* argv[])
 	spdlog::info("OT3D-3.0.0");
 
 	OT3D::GlobalParam* gp = OT3D::GlobalParam::Instance();
-	gp->ParseConfig("data/config_file.yml");
+	gp->ParseConfig(argv[1]);
 
 	//////////////////////////////////////////////// Read camera parameters ////////////////////////////////////////////////
 
