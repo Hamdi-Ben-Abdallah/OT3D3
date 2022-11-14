@@ -429,9 +429,9 @@ void View::RenderShaded(vector<Model*> models, GLenum polyonMode, const std::vec
 			phongblinnShaderProgram->setUniformValue("uMVMatrix", QMatrix4x4(modelViewMatrix.val));
 			phongblinnShaderProgram->setUniformValue("uMVPMatrix", QMatrix4x4(modelViewProjectionMatrix.val));
 			phongblinnShaderProgram->setUniformValue("uNormalMatrix", QMatrix3x3(normalMatrix.val));
-			phongblinnShaderProgram->setUniformValue("uLightPosition1", QVector3D(0.1, 0.1, -0.02));
-			phongblinnShaderProgram->setUniformValue("uLightPosition2", QVector3D(-0.1, 0.1, -0.02));
-			phongblinnShaderProgram->setUniformValue("uLightPosition3", QVector3D(0.0, 0.0, 0.1));
+			phongblinnShaderProgram->setUniformValue("uLightPosition1", QVector3D(0.1f, 0.1f, -0.02f));
+			phongblinnShaderProgram->setUniformValue("uLightPosition2", QVector3D(-0.1f, 0.1f, -0.02f));
+			phongblinnShaderProgram->setUniformValue("uLightPosition3", QVector3D(0.0f, 0.0f, 0.1f));
 			phongblinnShaderProgram->setUniformValue("uShininess", 100.0f);
 			phongblinnShaderProgram->setUniformValue("uAlpha", 1.0f);
 

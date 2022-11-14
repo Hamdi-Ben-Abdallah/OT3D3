@@ -63,9 +63,9 @@ bool readInitialPose(const std::string filename, cv::Matx44f& initial_pose)
     fs["initial_pose"] >> pose;
 
     initial_pose = cv::Matx44f(pose.at<double>(0, 0), pose.at<double>(0, 1), pose.at<double>(0, 2), pose.at<double>(0, 3),
-        pose.at<double>(1, 0), pose.at<double>(1, 1), pose.at<double>(1, 2), pose.at<double>(1, 3),
-        pose.at<double>(2, 0), pose.at<double>(2, 1), pose.at<double>(2, 2), pose.at<double>(2, 3),
-        pose.at<double>(3, 0), pose.at<double>(3, 1), pose.at<double>(3, 2), pose.at<double>(3, 3));
+                               pose.at<double>(1, 0), pose.at<double>(1, 1), pose.at<double>(1, 2), pose.at<double>(1, 3),
+                               pose.at<double>(2, 0), pose.at<double>(2, 1), pose.at<double>(2, 2), pose.at<double>(2, 3),
+                               pose.at<double>(3, 0), pose.at<double>(3, 1), pose.at<double>(3, 2), pose.at<double>(3, 3));
 
     fs.release();
 

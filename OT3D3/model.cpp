@@ -14,32 +14,6 @@ using namespace cv;
 
 Model::Model(const string modelFilename, float tx, float ty, float tz, float alpha, float beta, float gamma, float scale)
 {
-    //m_id = 0;
-    //
-    //initialized = false;
-    //
-    //buffersInitialsed = false;
-    //
-    //T_i = Transformations::translationMatrix(tx, ty, tz)
-    //*Transformations::rotationMatrix(alpha, Vec3f(1, 0, 0))
-    //*Transformations::rotationMatrix(beta, Vec3f(0, 1, 0))
-    //*Transformations::rotationMatrix(gamma, Vec3f(0, 0, 1))
-    //*Matx44f::eye();
-    //
-    //T_cm = T_i;
-    //
-    //scaling = scale;
-    //
-    //T_n = Matx44f::eye();
-    //
-    //hasNormals = false;
-    //
-    //vertexBuffer = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
-    //normalBuffer = QOpenGLBuffer(QOpenGLBuffer::VertexBuffer);
-    //indexBuffer = QOpenGLBuffer(QOpenGLBuffer::IndexBuffer);
-    //
-    //loadModel(modelFilename);
-
 	Matx44f Ti = Transformations::translationMatrix(tx, ty, tz)
 	*Transformations::rotationMatrix(alpha, Vec3f(1, 0, 0))
 	*Transformations::rotationMatrix(beta, Vec3f(0, 1, 0))
@@ -57,13 +31,11 @@ void Model::Init(const std::string modelFilename, const cv::Matx44f& Ti, float s
 	m_id = 0;
     
 	initialized = false;
-    
 	buffersInitialsed = false;
     
 	T_i = Ti;
-    
 	T_cm = T_i;
-  T_pm = T_i;
+    T_pm = T_i;
 
 	scaling = scale;
     
@@ -76,12 +48,6 @@ void Model::Init(const std::string modelFilename, const cv::Matx44f& Ti, float s
 	indexBuffer = QOpenGLBuffer(QOpenGLBuffer::IndexBuffer);
     
 	loadModel(modelFilename);
-  
-  //if (tk::IsFileExist(modelFilename + 's')) {
-  //  loadSimpleModel(modelFilename + 's');
-  //} else {
-  //  svertices = vertices;
-  //}
 }
 
 Model::~Model()
@@ -202,7 +168,8 @@ Vec3f Model::getRTF()
     return rtf;
 }
 
-float Model::getScaling() {
+float Model::getScaling() 
+{
     
     return scaling;
 }
@@ -247,27 +214,28 @@ void Model::reset()
     T_cm = T_i;
 }
 
-void IdenInsert(std::vector<aiVector3D>& verts, const aiVector3D& vert) {
-  for (int i = 0; i < verts.size(); ++i) {
-    if (verts[i] == vert)
-      return;
-  }
+void IdenInsert(std::vector<aiVector3D>& verts, const aiVector3D& vert)
+{
+    for (int i = 0; i < verts.size(); ++i) {
+        if (verts[i] == vert)
+            return;
+    }
 
-  verts.push_back(vert);
+    verts.push_back(vert);
 }
 
 void IdentAdd(std::vector<Vec3f>& vertices, aiVector3D* aiv, unsigned int num) {
-  vertices.clear();
+    vertices.clear();
 
-  std::vector<aiVector3D> setv;
+    std::vector<aiVector3D> setv;
 
-  for (int i = 0; i < num; ++i) {
-    IdenInsert(setv, aiv[i]);
-  }
+    for (int i = 0; i < num; ++i) {
+        IdenInsert(setv, aiv[i]);
+    }
 
-  for (auto vert : setv) {
-    vertices.push_back(Vec3f(vert.x, vert.y, vert.z));
-  }
+    for (auto vert : setv) {
+        vertices.push_back(Vec3f(vert.x, vert.y, vert.z));
+    }
 }
 
 void Model::loadModel(const string modelFilename)
@@ -325,55 +293,49 @@ void Model::loadModel(const string modelFilename)
     offsets.push_back(0);
     offsets.push_back(mesh->mNumFaces*3);
     
-    // the center of the 3d bounding box
-    //Vec3f bbCenter = (rtf + lbn) / 2;
-    // compute a normalization transform that moves the object to the center of its bounding box and scales it according to the prescribed factor
-    //T_n = Transformations::scaleMatrix(scaling) * Transformations::translationMatrix(-bbCenter[0], -bbCenter[1], -bbCenter[2]);
+    //// the center of the 3d bounding box
+    // Vec3f bbCenter = (rtf + lbn) / 2;
 
-    //T_n = Transformations::scaleMatrix(scaling);
+    //// compute a normalization transform that moves the object to the center of its bounding box and scales it according to the prescribed factor
+    // T_n = Transformations::scaleMatrix(scaling) * Transformations::translationMatrix(-bbCenter[0], -bbCenter[1], -bbCenter[2]);
+
+    // T_n = Transformations::scaleMatrix(scaling);
 
 //#define DELETE_EXTRA_VERTEX
 #ifdef DELETE_EXTRA_VERTEX
-    if (tk::IsFileExist(modelFilename + 's')) {
+    if (tk::IsFileExist(modelFilename + 's')) 
+    {
       //loadSimpleModel(modelFilename + 's');
       Assimp::Importer importer;
       const aiScene* scene = importer.ReadFile(modelFilename, aiProcessPreset_TargetRealtime_Fast);
       aiMesh *smesh = scene->mMeshes[0];
       IdentAdd(svertices, smesh->mVertices, smesh->mNumVertices);
-    } else {
+    } 
+    else 
+    {
       //svertices = vertices;
       IdentAdd(svertices, mesh->mVertices, mesh->mNumVertices);
     }
 #else
-    if (IsFileExist(modelFilename + 's')) {
+    if (IsFileExist(modelFilename + 's')) 
+    {
       loadSimpleModel(modelFilename + 's');
-    } else {
+    } 
+    else 
+    {
       svertices = vertices;
     }
 #endif
 
 #define ADD_EDGE_VERTEX
 #ifdef ADD_EDGE_VERTEX
-    if (mesh->mNumVertices < 24*3) {
+    if (mesh->mNumVertices < 24*3) 
+    {
       std::vector<aiVector3D> setv;
 
-      for(int i = 0; i < mesh->mNumFaces; i++) {
+      for(int i = 0; i < mesh->mNumFaces; i++) 
+      {
         aiFace f = mesh->mFaces[i];
-
-        //aiVector3D dv = mesh->mVertices[f.mIndices[0]] - mesh->mVertices[f.mIndices[1]];
-        //setv.insert(mesh->mVertices[f.mIndices[1]] + 0.25f * dv);
-        //setv.insert(mesh->mVertices[f.mIndices[1]] + 0.5f * dv);
-        //setv.insert(mesh->mVertices[f.mIndices[1]] + 0.75f * dv);
-
-        //dv = mesh->mVertices[f.mIndices[1]] - mesh->mVertices[f.mIndices[2]];
-        //setv.insert(mesh->mVertices[f.mIndices[2]] + 0.25f * dv);
-        //setv.insert(mesh->mVertices[f.mIndices[2]] + 0.5f * dv);
-        //setv.insert(mesh->mVertices[f.mIndices[2]] + 0.75f * dv);
-
-        //dv = mesh->mVertices[f.mIndices[2]] - mesh->mVertices[f.mIndices[0]];
-        //setv.insert(mesh->mVertices[f.mIndices[0]] + 0.25f * dv);
-        //setv.insert(mesh->mVertices[f.mIndices[0]] + 0.5f * dv);
-        //setv.insert(mesh->mVertices[f.mIndices[0]] + 0.75f * dv);
 
         aiVector3D dv;
 
@@ -399,21 +361,27 @@ void Model::loadModel(const string modelFilename)
       svertices = vertices;
       int si = setv.size();
 
-      for (auto vert : setv) {
+      for (auto vert : setv) 
+      {
         svertices.push_back(Vec3f(vert.x, vert.y, vert.z));
       }
     }
 #endif
+
+    importer.FreeScene();
 }
 
-void Model::loadSimpleModel(const string modelFilename) {
-  Assimp::Importer importer;
-  const aiScene* scene = importer.ReadFile(modelFilename, aiProcessPreset_TargetRealtime_Fast);
-  aiMesh *mesh = scene->mMeshes[0];
-   
-  for(int i = 0; i < mesh->mNumVertices; i++) {
-    aiVector3D v = mesh->mVertices[i];
-    Vec3f p(v.x, v.y, v.z);
-    svertices.push_back(p);
-  }
+void Model::loadSimpleModel(const string modelFilename) 
+{
+    Assimp::Importer importer;
+    const aiScene* scene = importer.ReadFile(modelFilename, aiProcessPreset_TargetRealtime_Fast);
+    aiMesh* mesh = scene->mMeshes[0];
+
+    for (int i = 0; i < mesh->mNumVertices; i++) {
+        aiVector3D v = mesh->mVertices[i];
+        Vec3f p(v.x, v.y, v.z);
+        svertices.push_back(p);
+    }
+
+    importer.FreeScene();
 }
