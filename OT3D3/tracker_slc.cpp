@@ -29,8 +29,8 @@ enum {
 	RUN_DEBUG = 1,
 };
 
-SLCTracker::SLCTracker(const cv::Matx33f& K, std::vector<Object3D*>& objects)
-	: SLTracker(K, objects)
+SLCTracker::SLCTracker(const cv::Matx33f& K, const cv::Matx14f& distCoeffs, std::vector<Object3D*>& objects)
+	: SLTracker(K, distCoeffs, objects)
 {
 
 }
@@ -41,21 +41,21 @@ void SLCTracker::PreProcess(cv::Mat frame) {
 
 void SLCTracker::Track(std::vector<cv::Mat>& imagePyramid, std::vector<Object3D*>& objects, int runs) {
 #ifdef SHOW_SLC_DEBUG
-	RunIteration(objects, imagePyramid, 2, 12, 2, 8.0, 1.2);
-	RunIteration(objects, imagePyramid, 0, 12, 2, 8.0, 1.2, RUN_DEBUG);
+	RunIteration(objects, imagePyramid, 2, 12, 2, 8.0f, 1.2f);
+	RunIteration(objects, imagePyramid, 0, 12, 2, 8.0f, 1.2f, RUN_DEBUG);
 	for (int iter = 0; iter < runs * 3; iter++) {
 #else
 	for (int iter = 0; iter < runs * 4; iter++) {
 #endif
-		RunIteration(objects, imagePyramid, 2, 12, 2, 8.0, 1.2, 0.2f);
+		RunIteration(objects, imagePyramid, 2, 12, 2, 8.0f, 1.2f, 0.2f);
 	}
 
 	for (int iter = 0; iter < runs * 2; iter++) {
-		RunIteration(objects, imagePyramid, 1, 10, 2, 6.0, 1.0, 0.2f);
+		RunIteration(objects, imagePyramid, 1, 10, 2, 6.0f, 1.0f, 0.2f);
 	}
 
 	for (int iter = 0; iter < runs * 1; iter++) {
-		RunIteration(objects, imagePyramid, 0, 8, 2, 4.0, 0.8, 0.2f);
+		RunIteration(objects, imagePyramid, 0, 8, 2, 4.0f, 0.8f, 0.2f);
 	}
 }
 

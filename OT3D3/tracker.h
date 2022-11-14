@@ -10,13 +10,12 @@ class Viewer;
 
 class Tracker {
 public:
-	//Tracker(const cv::Matx33f& K, const cv::Matx14f& distCoeffs, std::vector<Object3D*>& objects);
-	Tracker(const cv::Matx33f& K, std::vector<Object3D*>& objects);
+	Tracker(const cv::Matx33f& K, const cv::Matx14f& distCoeffs, std::vector<Object3D*>& objects);
 
 	static Tracker* GetTracker(const cv::Matx33f& K, const cv::Matx14f& distCoeffs, std::vector<Object3D*>& objects);
 
-	virtual void ToggleTracking(int objectIndex, bool undistortFrame = true);
-	virtual void EstimatePoses(cv::Mat frame, bool check_lost);
+	virtual void ToggleTracking(cv::Mat& frame, int objectIndex, bool undistortFrame = true);
+	virtual void EstimatePoses(cv::Mat frame, bool undistortFrame);
 	virtual void PreProcess(cv::Mat frame) {}
 	virtual void PostProcess(cv::Mat frame) {}
 
@@ -49,9 +48,9 @@ protected:
 
 	View* view;
 	cv::Matx33f K;
-	//cv::Matx14f distCoeffs;
-	//cv::Mat map1;
-	//cv::Mat map2;
+	cv::Matx14f distCoeffs;
+	cv::Mat map1;
+	cv::Mat map2;
 
 	bool initialized;
 };
@@ -60,7 +59,7 @@ class Histogram;
 
 class TrackerBase : public Tracker {
 public:
-	TrackerBase(const cv::Matx33f& K, std::vector<Object3D*>& objects);
+	TrackerBase(const cv::Matx33f& K, const cv::Matx14f& distCoeffs, std::vector<Object3D*>& objects);
 
 	virtual void PreProcess(cv::Mat frame) override;
 	virtual void PostProcess(cv::Mat frame) override;
@@ -77,7 +76,7 @@ class SearchLine;
 
 class SLTracker: public TrackerBase {
 public:
-	SLTracker(const cv::Matx33f& K, std::vector<Object3D*>& objects);
+	SLTracker(const cv::Matx33f& K, const cv::Matx14f& distCoeffs, std::vector<Object3D*>& objects);
 
 	void GetBundleProb(const cv::Mat& frame, int oid);
 	void FilterOccludedPoint(const cv::Mat& mask, const cv::Mat& depth);

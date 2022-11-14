@@ -66,8 +66,8 @@ cv::Mat drawMeshOverlay(View* view, const std::vector<Model*>& objects, const cv
 	view->setLevel(0);
 
 	std::vector<cv::Point3f> colors;
-	colors.push_back(cv::Point3f(1.0, 0.5, 0.0));
-	colors.push_back(cv::Point3f(0.2, 0.3, 1.0));
+	colors.push_back(cv::Point3f(1.0f, 0.5f, 0.0f));
+	colors.push_back(cv::Point3f(0.2f, 0.3f, 1.0f));
 	//RenderShaded(std::vector<Model*>(objects.begin(), objects.end()), GL_FILL, colors, true);
 	//RenderNormals(std::vector<Model*>(objects.begin(), objects.end()), GL_FILL);
 	cv::Mat result = frame.clone();
@@ -83,9 +83,9 @@ cv::Mat drawFragmentOverlay(View* view, const std::vector<Model*>& objects, cons
 	view->setLevel(0);
 
 	std::vector<cv::Point3f> colors;
-	colors.push_back(cv::Point3f(1.0, 0.5, 0.0));
-	//colors.push_back(cv::Point3f(0.0, 1.0, 0.0));
-	//colors.push_back(Point3f(0.2, 0.3, 0.0));
+	colors.push_back(cv::Point3f(1.0f, 0.5f, 0.0f));
+	//colors.push_back(cv::Point3f(0.0f, 1.0f, 0.0f));
+	//colors.push_back(Point3f(0.2f, 0.3f, 0.0f));
 	view->RenderShaded(std::vector<Model*>(objects.begin(), objects.end()), GL_FILL, colors, true);
 	//RenderNormals(std::vector<Model*>(objects.begin(), objects.end()), GL_FILL);
 
@@ -179,7 +179,6 @@ int main(int argc, char* argv[])
 
 	std::shared_ptr<Tracker> tracker_ptr(Tracker::GetTracker(K, D, objects));
 
-
 	//////////////////////////////////////////////// Open video ////////////////////////////////////////////////
 
 	// Open video
@@ -214,7 +213,7 @@ int main(int argc, char* argv[])
 		auto e1 = cv::getTickCount();
 
 		// the main pose uodate call
-		tracker_ptr->EstimatePoses(frame, true);
+		tracker_ptr->EstimatePoses(frame, false);
 		tracker_ptr->PostProcess(frame);
 
 		auto e2 = cv::getTickCount();
@@ -235,7 +234,7 @@ int main(int argc, char* argv[])
 		if (key == 32) // Space: start/stop tracking
 		{
 			timeout = 1;
-			tracker_ptr->ToggleTracking(0, false);
+			tracker_ptr->ToggleTracking(frame, 0, false);
 			tracker_ptr->EstimatePoses(frame, false);
 		}
 

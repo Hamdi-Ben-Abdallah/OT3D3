@@ -1,10 +1,11 @@
 #include <iostream>
-
 #include <glog/logging.h>
+#include <spdlog/spdlog.h>
+
 #include "view.h"
 
-using namespace std;
 using namespace cv;
+using namespace std;
 
 View* View::instance;
 
@@ -28,9 +29,9 @@ View::View(void) {
 
 	calibrationMatrices.push_back(Matx44f::eye());
 
-	projectionMatrix = Transformations::perspectiveMatrix(40, 4.0f / 3.0f, 0.1, 1000.0);
+	projectionMatrix = Transformations::perspectiveMatrix(40, 4.0f / 3.0f, 0.1f, 1000.0f);
 
-	lookAtMatrix = Transformations::lookAtMatrix(0, 0, 0, 0, 0, 1, 0, -1, 0);
+	lookAtMatrix = Transformations::lookAtMatrix(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f);
 
 	currentLevel = 0;
 }
@@ -135,7 +136,8 @@ void View::init(const Matx33f& K, int width, int height, float zNear, float zFar
 		calibrationMatrices.push_back(K_l);
 	}
 
-	//cout << "GL Version " << glGetString(GL_VERSION) << endl << "GLSL Version " << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
+	spdlog::debug("GL Version {0}", (char*)glGetString(GL_VERSION));
+	spdlog::debug("GLSL Version {0}", (char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
 
 	glEnable(GL_DEPTH);
 	glEnable(GL_DEPTH_TEST);
@@ -156,10 +158,6 @@ void View::init(const Matx33f& K, int width, int height, float zNear, float zFar
 	initShaderProgramFromCode(silhouetteShaderProgram, silhouette_vertex_shader, silhouette_fragment_shader);
 	initShaderProgramFromCode(phongblinnShaderProgram, phongblinn_vertex_shader, phongblinn_fragment_shader);
 	initShaderProgramFromCode(normalsShaderProgram, normals_vertex_shader, normals_fragment_shader);
-
-	//initShaderProgram(silhouetteShaderProgram, "silhouette");
-	//initShaderProgram(phongblinnShaderProgram, "phongblinn");
-	//initShaderProgram(normalsShaderProgram, "normals");
 
 	angle = 0;
 
@@ -210,25 +208,29 @@ bool View::initRenderingBuffers() {
 
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthTextureID, 0);
 
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-		cout << "error creating rendering buffers" << endl;
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) 
+	{
+		spdlog::error("Error creating rendering buffers");
 		return false;
 	}
 	return true;
 }
 
 bool View::initShaderProgramFromCode(QOpenGLShaderProgram* program, char* vertex_shader, char* fragment_shader) {
-	if (!program->addShaderFromSourceCode(QOpenGLShader::Vertex, vertex_shader)) {
-		cout << "error adding vertex shader from source file" << endl;
+	if (!program->addShaderFromSourceCode(QOpenGLShader::Vertex, vertex_shader)) 
+	{
+		spdlog::error("Error adding vertex shader from source file");
 		return false;
 	}
-	if (!program->addShaderFromSourceCode(QOpenGLShader::Fragment, fragment_shader)) {
-		cout << "error adding fragment shader from source file" << endl;
+	if (!program->addShaderFromSourceCode(QOpenGLShader::Fragment, fragment_shader)) 
+	{
+		spdlog::error("Error adding fragment shader from source file");
 		return false;
 	}
 
-	if (!program->link()) {
-		cout << "error linking shaders" << endl;
+	if (!program->link()) 
+	{
+		spdlog::error("Error linking shaders");
 		return false;
 	}
 	return true;
@@ -615,10 +617,6 @@ void View::ProjectPoints(const std::vector<cv::Point3f>& pts3d, const cv::Matx44
 	for (int i = 0; i < pts3d.size(); i++) {
 		Vec4f p = calibrationMatrices[currentLevel] * pose * cv::Vec4f(pts3d[i].x, pts3d[i].y, pts3d[i].z, 1.0f);
 
-		//if (p[2] == 0)
-		//	continue;
-
-		//Point2f p2d = Point2f(p[0] / p[2], p[1] / p[2]);
 		float x = p[0] / p[2];
 		float y = p[1] / p[2];
 
@@ -634,10 +632,6 @@ void View::ProjectPoints(const std::vector<cv::Point3f>& pts3d, const cv::Matx44
 	for (int i = 0; i < pts3d.size(); i++) {
 		Vec4f p = calibrationMatrices[currentLevel] * pose * cv::Vec4f(pts3d[i].x, pts3d[i].y, pts3d[i].z, 1.0f);
 
-		//if (p[2] == 0)
-		//	continue;
-
-		//Point2f p2d = Point2f(p[0] / p[2], p[1] / p[2]);
 		float x = p[0] / p[2];
 		float y = p[1] / p[2];
 
