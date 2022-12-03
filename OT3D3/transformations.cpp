@@ -31,13 +31,13 @@ Matx44f Transformations::translationMatrix(float tx, float ty, float tz)
 
 Matx44f Transformations::rotationMatrix(float angle, cv::Vec3f axis)
 {
-    angle = (angle/180)*CV_PI;
+    angle = (angle / 180) * CV_PI;
     
     float s = sin(angle);
     float c = cos(angle);
     float mc = 1.0f - c;
     
-    float len = norm(axis);
+    float len = (float)norm(axis);
     
     if (len == 0)
     {
@@ -81,8 +81,8 @@ Matx44f Transformations::lookAtMatrix(float ex, float ey, float ez, float cx, fl
 
 Matx44f Transformations::perspectiveMatrix(float fovy, float aspect, float zNear, float zFar)
 {
-    fovy = fovy*(float)CV_PI/180.0;
-    float focal = 1.0/tan(fovy/2.0);
+    fovy = fovy * (float)CV_PI / 180.0;
+    float focal = 1.0 / tan(fovy / 2.0);
     
     float n = zNear;
     float f = zFar;
@@ -143,7 +143,7 @@ Matx44f Transformations::exp(Matx61f xi)
     Vec3f v = Vec3f(xi(3, 0), xi(4, 0), xi(5, 0));
     
     // angle of the twist/rotation
-    float theta = norm(r);
+    float theta = (float)norm(r);
     
     // return the identity group element for theta == 0, as there is no motion
     if(abs(theta) < FLT_EPSILON)

@@ -133,7 +133,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;NOMINMAX;GLOG_NO_ABBREVIATED_SEVERITIES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;NOMINMAX;_CRT_SECURE_NO_WARNINGS;GLOG_NO_ABBREVIATED_SEVERITIES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -146,7 +146,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="camcorder.h" />
     <ClInclude Include="dirent_win.h" />
     <ClInclude Include="global_params.h" />
     <ClInclude Include="histogram.h" />
@@ -165,6 +164,7 @@
     <ClInclude Include="types.h" />
     <ClInclude Include="utils.h" />
     <ClInclude Include="view.h" />
+    <ClInclude Include="viewer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="global_params.cpp" />
@@ -183,6 +183,7 @@
     <ClCompile Include="transformations.cpp" />
     <ClCompile Include="utils.cpp" />
     <ClCompile Include="view.cpp" />
+    <ClCompile Include="viewer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

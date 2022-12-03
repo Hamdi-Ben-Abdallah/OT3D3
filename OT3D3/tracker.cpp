@@ -1,22 +1,24 @@
 #include <iomanip>
+
 #include <glog/logging.h>
+
 #include <opencv2/highgui.hpp>
+
 #include "view.h"
-#include "histogram.h"
 #include "tracker.h"
 #include "object3d.h"
+#include "histogram.h"
 #include "search_line.h"
 #include "tracker_slc.h"
 
-//Tracker::Tracker(const cv::Matx33f& K, const cv::Matx14f& distCoeffs, std::vector<Object3D*>& objects) {
-Tracker::Tracker(const cv::Matx33f& K, std::vector<Object3D*>& objects) {
+Tracker::Tracker(const cv::Matx33f& K, const cv::Matx14f& distCoeffs, std::vector<Object3D*>& objects) {
 	initialized = false;
 
 	view = View::Instance();
 
 	this->K = K;
-	//this->distCoeffs = distCoeffs;
-	//initUndistortRectifyMap(K, distCoeffs, cv::noArray(), K, cv::Size(view->GetWidth(), view->GetHeight()), CV_16SC2, map1, map2);
+	this->distCoeffs = distCoeffs;
+	initUndistortRectifyMap(K, distCoeffs, cv::noArray(), K, cv::Size(view->GetWidth(), view->GetHeight()), CV_16SC2, map1, map2);
 
 	for (int i = 0; i < objects.size(); i++) {
 		objects[i]->setModelID(i + 1);
@@ -27,16 +29,16 @@ Tracker::Tracker(const cv::Matx33f& K, std::vector<Object3D*>& objects) {
 	}
 
 	render_time = 0;
-	sl_time = 0;
-	jac_time = 0;
-	sc_time = 0;
-	pp_time = 0;
+	sl_time		= 0;
+	jac_time	= 0;
+	sc_time		= 0;
+	pp_time		= 0;
 }
 
 Tracker* Tracker::GetTracker(const cv::Matx33f& K, const cv::Matx14f& distCoeffs, std::vector<Object3D*>& objects) {
 	Tracker* poseEstimator = NULL;
 
-	poseEstimator = new SLCTracker(K, objects);
+	poseEstimator = new SLCTracker(K, distCoeffs, objects);
 
 	CHECK(poseEstimator) << "Check |tracker_mode| in yml file";
 	return poseEstimator;
@@ -119,13 +121,13 @@ void Tracker::CheckPose(std::vector<Object3D*>& objects) {
 //view->BackProjectPoints(contours[0], depth_map, pose* normalization, pts3d);
 //OutputPly(pts3d, "pts3d.ply");
 
-void Tracker::ToggleTracking(int objectIndex, bool undistortFrame) {
+void Tracker::ToggleTracking(cv::Mat& frame, int objectIndex, bool undistortFrame) {
 	if (objectIndex >= objects.size())
 		return;
 
-	//if (undistortFrame) {
-	//	cv::remap(frame, frame, map1, map2, cv::INTER_LINEAR);
-	//}
+	if (undistortFrame) {
+		cv::remap(frame, frame, map1, map2, cv::INTER_LINEAR);
+	}
 
 	if (!objects[objectIndex]->isInitialized()) {
 		objects[objectIndex]->initialize();
@@ -141,20 +143,24 @@ void Tracker::ToggleTracking(int objectIndex, bool undistortFrame) {
 	}
 }
 
-void Tracker::EstimatePoses(cv::Mat frame, bool check_lost) 
+void Tracker::EstimatePoses(cv::Mat frame, bool undistortFrame)
 {
+	if (undistortFrame)
+	{
+		// Remap the input image to undistort
+		remap(frame, frame, map1, map2, cv::INTER_LINEAR);
+	}
+
 	std::vector<cv::Mat> imagePyramid;
 	cv::Mat frameCpy = frame.clone();
 	imagePyramid.push_back(frameCpy);
 
-	for (int l = 1; l < 4; l++) 
-	{
+	for (int l = 1; l < 4; l++) {
 		cv::resize(frame, frameCpy, cv::Size(frame.cols / pow(2, l), frame.rows / pow(2, l)));
 		imagePyramid.push_back(frameCpy);
 	}
 
-	if (initialized) 
-	{
+	if (initialized) {
 		Track(imagePyramid, objects);
 		//CheckPose(objects);
 	}
@@ -286,13 +292,10 @@ void Tracker::ShowMask(const cv::Mat& masks, cv::Mat& buf) {
 	}
 }
 
-TrackerBase::TrackerBase(const cv::Matx33f& K, std::vector<Object3D*>& objects) 
-: Tracker(K, objects) 
+TrackerBase::TrackerBase(const cv::Matx33f& K, const cv::Matx14f& distCoeffs, std::vector<Object3D*>& objects)
+: Tracker(K, distCoeffs, objects)
 {
 	hists = new RBOTHist(objects);
-	//hists = new TestHist(objects);
-	//hists = new GlobalHist(objects);
-	//hists = new WTCLCHist(objects);
 }
 
 void TrackerBase::DetectEdge(const cv::Mat& img, cv::Mat& img_edge) {
@@ -313,7 +316,6 @@ void TrackerBase::PostProcess(cv::Mat frame) {
 }
 
 void TrackerBase::UpdateHist(cv::Mat frame) {
-
 	float afg = 0.1f, abg = 0.2f;
 	if (initialized) {
 		view->setLevel(0);
@@ -327,8 +329,8 @@ void TrackerBase::UpdateHist(cv::Mat frame) {
 	}
 }
 
-SLTracker::SLTracker(const cv::Matx33f& K, std::vector<Object3D*>& objects)
-	: TrackerBase(K, objects)
+SLTracker::SLTracker(const cv::Matx33f& K, const cv::Matx14f& distCoeffs, std::vector<Object3D*>& objects)
+	: TrackerBase(K, distCoeffs, objects)
 {
 	search_line = std::make_shared<SearchLine>();
 }

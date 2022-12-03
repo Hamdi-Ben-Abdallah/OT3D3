@@ -483,7 +483,7 @@ public:
                     {
                         if(i >= _src.rows)
                             break;
-                        float ds = sqrt(d2);
+                        float ds = (float)sqrt(d2);
                         
                         bool bg = dd[x*_src.rows+i] > 0;
                         ds = bg ? ds : -ds;

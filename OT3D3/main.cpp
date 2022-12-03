@@ -13,103 +13,10 @@
 
 #include "view.h"
 #include "utils.h" 
+#include "viewer.h"
 #include "tracker.h"
 #include "object3d.h"
 #include "global_params.h"
-
-
-
-cv::Mat drawContourOverlay(View* view, const std::vector<Model*>& objects, const cv::Mat& frame) 
-{
-	view->setLevel(0);
-	view->RenderSilhouette(std::vector<Model*>(objects.begin(), objects.end()), GL_FILL);
-
-	cv::Mat depth_map = view->DownloadFrame(View::DEPTH);
-	cv::Mat masks_map;
-	if (objects.size() > 1) 
-	{
-		masks_map = view->DownloadFrame(View::MASK);
-	}
-	else 
-	{
-		masks_map = depth_map;
-	}
-
-	cv::Mat result = frame.clone();
-
-	for (int oid = 0; oid < objects.size(); oid++) 
-	{
-		cv::Mat mask_map;
-		view->ConvertMask(masks_map, mask_map, objects[oid]->getModelID());
-
-		std::vector<std::vector<cv::Point> > contours;
-		cv::findContours(mask_map, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_NONE);
-
-		cv::Vec3b color;
-		if (0 == oid)
-			color = cv::Vec3b(0, 255, 0);
-		if (1 == oid)
-			color = cv::Vec3b(0, 0, 255);
-
-		for (auto contour : contours)
-			for (auto pt : contour) 
-			{
-				result.at<cv::Vec3b>(pt) = color;
-			}
-	}
-
-	return result;
-}
-
-cv::Mat drawMeshOverlay(View* view, const std::vector<Model*>& objects, const cv::Mat& frame) 
-{
-	view->setLevel(0);
-
-	std::vector<cv::Point3f> colors;
-	colors.push_back(cv::Point3f(1.0, 0.5, 0.0));
-	colors.push_back(cv::Point3f(0.2, 0.3, 1.0));
-	//RenderShaded(std::vector<Model*>(objects.begin(), objects.end()), GL_FILL, colors, true);
-	//RenderNormals(std::vector<Model*>(objects.begin(), objects.end()), GL_FILL);
-	cv::Mat result = frame.clone();
-	view->RenderCV(objects[0], result);
-	//RenderCV(objects[0], result, cv::Scalar(1,255,1));
-	//RenderCV(objects[1], result, cv::Scalar(1,1,255));
-	return result;
-}
-
-cv::Mat drawFragmentOverlay(View* view, const std::vector<Model*>& objects, const cv::Mat& frame) 
-{
-	// render the models with phong shading
-	view->setLevel(0);
-
-	std::vector<cv::Point3f> colors;
-	colors.push_back(cv::Point3f(1.0, 0.5, 0.0));
-	//colors.push_back(cv::Point3f(0.0, 1.0, 0.0));
-	//colors.push_back(Point3f(0.2, 0.3, 0.0));
-	view->RenderShaded(std::vector<Model*>(objects.begin(), objects.end()), GL_FILL, colors, true);
-	//RenderNormals(std::vector<Model*>(objects.begin(), objects.end()), GL_FILL);
-
-	// download the rendering to the CPU
-	cv::Mat rendering = view->DownloadFrame(View::RGB);
-
-	// download the depth buffer to the CPU
-	cv::Mat depth = view->DownloadFrame(View::DEPTH);
-
-	// compose the rendering with the current camera image for demo purposes (can be done more efficiently directly in OpenGL)
-	cv::Mat result = frame.clone();
-	for (int y = 0; y < frame.rows; y++)
-		for (int x = 0; x < frame.cols; x++) 
-		{
-			cv::Vec3b color = rendering.at<cv::Vec3b>(y, x);
-			if (depth.at<float>(y, x) != 0.0f) 
-			{
-				result.at<cv::Vec3b>(y, x)[0] = color[2];
-				result.at<cv::Vec3b>(y, x)[1] = color[1];
-				result.at<cv::Vec3b>(y, x)[2] = color[0];
-			}
-		}
-	return result;
-}
 
 
 int main(int argc, char* argv[]) 
@@ -118,10 +25,10 @@ int main(int argc, char* argv[])
 	QApplication a(argc, argv);
 
 	spdlog::set_level(spdlog::level::debug); // Set global log level to debug
-	spdlog::info("OT3D-1.0.0");
+	spdlog::info("OT3D-3.0.0");
 
 	OT3D::GlobalParam* gp = OT3D::GlobalParam::Instance();
-	gp->ParseConfig("data/config_file.yml");
+	gp->ParseConfig(argv[1]);
 
 	//////////////////////////////////////////////// Read camera parameters ////////////////////////////////////////////////
 
@@ -179,7 +86,6 @@ int main(int argc, char* argv[])
 
 	std::shared_ptr<Tracker> tracker_ptr(Tracker::GetTracker(K, D, objects));
 
-
 	//////////////////////////////////////////////// Open video ////////////////////////////////////////////////
 
 	// Open video
@@ -192,6 +98,11 @@ int main(int argc, char* argv[])
 		exit(-1);
 	}
 
+
+	auto viewer_ptr = std::make_shared<FragmentViewer>();
+	viewer_ptr->Init(view, std::vector<Model*>(objects.begin(), objects.end()));
+	spdlog::debug("Initialize viewer...");
+
 	spdlog::debug("Localization algorithm is ready. Click on 'SPACE' to start.");
 
 	// Create a display window
@@ -199,7 +110,8 @@ int main(int argc, char* argv[])
 
 	cv::Mat frame;
 	int timeout = 0;
-	
+	bool stopTracking = false;
+	GLenum polygonMode = GL_FILL;
 	while (true) 
 	{
 		cap >> frame;
@@ -214,13 +126,13 @@ int main(int argc, char* argv[])
 		auto e1 = cv::getTickCount();
 
 		// the main pose uodate call
-		tracker_ptr->EstimatePoses(frame, true);
+		tracker_ptr->EstimatePoses(frame, false);
 		tracker_ptr->PostProcess(frame);
 
 		auto e2 = cv::getTickCount();
 		auto time = 1000 * ((e2 - e1) / cv::getTickFrequency());
 
-		cv::Mat result = drawFragmentOverlay(view, std::vector<Model*>(objects.begin(), objects.end()), frame);
+		cv::Mat result = viewer_ptr->DrawOverlay(frame, polygonMode, gp->color);
 
 		cv::putText(result, cv::format("Time: %3.2f ms", time), cv::Point(5, 35), cv::FONT_HERSHEY_DUPLEX, 1.0, cv::Scalar(255, 255, 255), 1, cv::LINE_AA);
 
@@ -232,17 +144,46 @@ int main(int argc, char* argv[])
 
 		int key = cv::waitKey(timeout);
 
+		if (key == 16) // Pause video (ctrl + p)
+		{
+			stopTracking = !stopTracking;
+			if (stopTracking)
+				timeout = 0;
+			else
+				timeout = 1;
+		}
+
+		if (key == (int)'w' || key == (int)'W') // Modify the representation of all actors so that they are wireframe.
+		{
+			if (polygonMode == GL_LINE)
+				polygonMode = GL_FILL;
+			else
+				polygonMode = GL_LINE;
+		}
+		if (key == (int)'s' || key == (int)'S') // Modify the representation of all actors so that they are surfaces.
+		{
+			polygonMode = GL_FILL;
+		}
+		if (key == (int)'p' || key == (int)'P') // Modify the representation of all actors so that they are points.
+		{
+			if (polygonMode == GL_POINT)
+				polygonMode = GL_FILL;
+			else
+				polygonMode = GL_POINT;
+		}
+
 		if (key == 32) // Space: start/stop tracking
 		{
 			timeout = 1;
-			tracker_ptr->ToggleTracking(0, false);
+			tracker_ptr->ToggleTracking(frame, 0, false);
 			tracker_ptr->EstimatePoses(frame, false);
 		}
 
 		if (27 == key)
 			break;
 
-		if ('r' == key) {
+		if ('r' == key) 
+		{
 			for (int i = 0; i < objects.size(); ++i) 
 			{
 				objects[i]->setPose(initial_pose);

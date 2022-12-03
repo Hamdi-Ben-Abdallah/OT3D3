@@ -69,7 +69,6 @@ public:
 
 	void ProjectBoundingBox(Model* model, std::vector<cv::Point2f>& projections, cv::Matx44f& pose, cv::Rect& boundingRect);
 	void ProjectBoundingBox(Model* model, std::vector<cv::Point2f>& projections, cv::Rect& boundingRect);
-	//void BackProject(cv::Point& pt, cv::Point3f& pt3d);
 	void ProjectPoints(const std::vector<cv::Point3f>& pts3d, const cv::Matx44f& pose, std::vector<cv::Point2f>& pts);
 	void ProjectPoints(const std::vector<cv::Point3f>& pts3d, const cv::Matx44f& pose, std::vector<cv::Point>& pts);
 	void BackProjectPoints(std::vector<cv::Point>& pts, const cv::Mat& depth_map, const cv::Matx44f& pose, std::vector<cv::Point3f>& pts3d);
@@ -96,10 +95,10 @@ private:
 	int fullWidth;
 	int fullHeight;
 
-	float zn;
-	float zf;
+	float zn = 10.f;
+	float zf = 1000.0f;
 
-	int numLevels;
+	int numLevels = 4;
 
 	int currentLevel;
 

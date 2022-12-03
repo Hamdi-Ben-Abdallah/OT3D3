@@ -1,6 +1,8 @@
 #include <iostream>
-#include <opencv2/core.hpp>
+
 #include <glog/logging.h>
+#include <opencv2/core.hpp>
+
 #include "tclc_histograms.h"
 #include "search_line.h"
 

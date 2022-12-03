@@ -7,7 +7,6 @@
 
 namespace OT3D 
 {
-
 	GlobalParam* GlobalParam::instance = NULL;
 
 	GlobalParam::GlobalParam() 
