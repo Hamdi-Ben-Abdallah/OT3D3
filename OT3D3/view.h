@@ -4,12 +4,11 @@
 #include <iostream>
 #include <vector>
 
-#include <QOpenGLContext>
-#include <QOffscreenSurface>
+#include <QtGui/QOpenGLContext>
+#include <QtGui/QOffscreenSurface>
 
-#include <QGLFramebufferObject>
-#include <QOpenGLShaderProgram>
-#include <QOpenGLFunctions_3_3_Core>
+#include <QtGui/QOpenGLShaderProgram>
+#include <QtGui/QOpenGLFunctions_3_3_Core>
 
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>

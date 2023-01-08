@@ -3,8 +3,8 @@
 #include <fstream>
 #include <iostream>
 
-#include <QThread>
-#include <QApplication>
+#include <QtCore/QThread>
+#include <QtWidgets/QApplication>
 
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>

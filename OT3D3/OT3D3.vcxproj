@@ -65,14 +65,19 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(G2_3RDPARTY)\Glog-0.6.0_x64-Debug.props" />
+    <Import Project="$(G2_3RDPARTY)\spdlog-1.11.0_vc16_x64-Debug.props" />
+    <Import Project="$(G2_3RDPARTY)\Qt-5.15.2_vc16_x64-Debug.props" />
+    <Import Project="$(G2_3RDPARTY)\OpenCV-4.6.0_msvc2019_x64-Debug.props" />
+    <Import Project="$(G2_3RDPARTY)\Assimp-5.2.5_vc16_x64-Debug.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(OT3D_3RDPARTY)\Qt-5.15.2_vc16_x64-Release.props" />
-    <Import Project="$(OT3D_3RDPARTY)\spdlog-1.11.0_vc16_x64-Release.props" />
-    <Import Project="$(OT3D_3RDPARTY)\OpenCV-4.6.0_x64-Release.props" />
-    <Import Project="$(OT3D_3RDPARTY)\Glog-0.6.0_x64-Release.props" />
-    <Import Project="$(OT3D_3RDPARTY)\Assimp-5.2.5_vc16_x64-Release.props" />
+    <Import Project="$(G2_3RDPARTY)\Qt-5.15.2_vc16_x64-Release.props" />
+    <Import Project="$(G2_3RDPARTY)\OpenCV-4.6.0_msvc2019_x64-Release.props" />
+    <Import Project="$(G2_3RDPARTY)\Assimp-5.2.5_vc16_x64-Release.props" />
+    <Import Project="$(G2_3RDPARTY)\spdlog-1.11.0_vc16_x64-Release.props" />
+    <Import Project="$(G2_3RDPARTY)\Glog-0.6.0_x64-Release.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -119,12 +124,13 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;NOMINMAX;_CRT_SECURE_NO_WARNINGS;GLOG_NO_ABBREVIATED_SEVERITIES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

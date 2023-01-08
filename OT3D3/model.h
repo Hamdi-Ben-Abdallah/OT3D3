@@ -1,7 +1,7 @@
 #pragma once
 
-#include <QOpenGLBuffer>
-#include <QOpenGLShaderProgram>
+#include <QtGui/QOpenGLBuffer>
+#include <QtGui/QOpenGLShaderProgram>
 
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
